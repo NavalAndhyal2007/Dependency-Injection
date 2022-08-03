@@ -1,4 +1,5 @@
 ﻿using DIWebApiTutorial.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,35 +10,52 @@ namespace DIWebApiTutorial.EmployeeService
     public class EmployeeRepository : IEmployeeService
     {
         public EmployeeContext _employeeDbContext;
+        private readonly object employeeLock = new object();
+
         public EmployeeRepository(EmployeeContext employeeDbContext)
         {
             _employeeDbContext = employeeDbContext;
         }
         public async Task<Employee> AddEmployee(Employee employee)
         {
-            _employeeDbContext.EmployeeTbl.Add(employee);
-            _employeeDbContext.SaveChanges();
+            lock (employeeLock)
+            {
+                _employeeDbContext.EmployeeTbl.AddAsync(employee);
+                _employeeDbContext.SaveChangesAsync();                
+            }
             return await Task.FromResult(employee);
         }
         public async Task<List<Employee>> GetEmployees()
         {
-            return await Task.Run(() => _employeeDbContext.EmployeeTbl.ToList<Employee>());//(List<Employee>)await _employeeDbContext.Employees.ToList();
+            return await _employeeDbContext.EmployeeTbl.ToListAsync();//(List<Employee>)await _employeeDbContext.Employees.ToList();
         }
 
         public async Task<Employee> UpdateEmployee(Employee employee)
         {
-            _employeeDbContext.EmployeeTbl.Update(employee);
-            _employeeDbContext.SaveChanges();
+            lock (employeeLock)
+            {
+                _employeeDbContext.EmployeeTbl.Update(employee);
+                _employeeDbContext.SaveChangesAsync();
+            }
             return await Task.FromResult(employee);
         }
 
         public async Task<Employee> DeleteEmployee(int Id)
         {
-            var employee = _employeeDbContext.EmployeeTbl.FirstOrDefault(x => x.EmpID == Id);
+            Employee employee = null;
+            employee = await _employeeDbContext.EmployeeTbl.FirstOrDefaultAsync(x => x.EmpID == Id);
+
+            //lock (employeeLock)
+            //{
+            //    employee = await _employeeDbContext.EmployeeTbl.FirstOrDefaultAsync(x => x.EmpID == Id);
+            //}
             if (employee != null)
             {
-                _employeeDbContext.Remove(employee);
-                _employeeDbContext.SaveChanges();
+                lock (employeeLock)
+                {
+                    _employeeDbContext.Remove(employee);
+                    _employeeDbContext.SaveChangesAsync();
+                }
                 return await Task.FromResult(employee);
             }
             return null;
@@ -45,7 +63,7 @@ namespace DIWebApiTutorial.EmployeeService
 
         public async Task<Employee> GetEmployee(int Id)
         {
-            return await Task.FromResult(_employeeDbContext.EmployeeTbl.FirstOrDefault(x => x.EmpID == Id));
+            return await _employeeDbContext.EmployeeTbl.FirstOrDefaultAsync(x => x.EmpID == Id);
         }
     }
 }

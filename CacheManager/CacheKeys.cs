@@ -8,5 +8,6 @@ namespace DIWebApiTutorial.Models
     public class CacheKeys
     {
         public static string GetAllEmployeesKey = "GetAllEmployeesKey";
+        public static string GetAllEmployeeKey = "GetAllEmployeeKey";
     }
 }

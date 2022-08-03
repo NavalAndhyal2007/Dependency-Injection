@@ -1,5 +1,6 @@
 ﻿using DIWebApiTutorial.EmployeeService;
 using DIWebApiTutorial.Models;
+using DIWebApiTutorial.CacheManager;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace DIWebApiTutorial.Controllers
 {
@@ -34,41 +36,32 @@ namespace DIWebApiTutorial.Controllers
         //public IEnumerable<Employee> GetEmployees([FromQuery] RequestQuery requestQuery)
         public async Task<List<Employee>> GetEmployees([FromQuery] RequestQuery requestQuery)
         {
-
+            return await CacheManager.CacheManager.GetEmployees(requestQuery, _employeeService, _memCacheProvider);//CacheManager.GetEmployees(requestQuery,_employeeService,_memCacheProvider);
+            //return await CacheManager.GetEmployees(requestQuery, _employeeService, _memCacheProvider);//CacheManager.GetEmployees(requestQuery,_employeeService,_memCacheProvider);
             //List<Employee> Employees = new List<Employee>();
-
-            //    Employees = _employeeService.GetEmployees().Where(s => s.EmpAge > requestQuery.MinAge)
-            //                                .Where(s => s.EmpAge < requestQuery.MaxAge).ToList();
+            //if (_memCacheProvider.TryGetValue(CacheKeys.GetAllEmployeesKey, out Employees))
+            //{
+            //    return await Task.FromResult(Employees);
+            //}
+            //else
+            //{
+            //    Employees = _employeeService.GetEmployees().Result.Where(s => s.Salary > requestQuery.MinSal && s.Salary < requestQuery.MaxSal)
+            //        .OrderBy(s => s.EmployeeID)                       
+            //        .ToList();
 
             //    Employees = Employees.Skip(requestQuery.PageSize * (requestQuery.Page - 1))
             //                .Take(requestQuery.PageSize).ToList();
-            //return Employees;
 
 
-            List<Employee> Employees = new List<Employee>();
-            if (_memCacheProvider.TryGetValue(CacheKeys.GetAllEmployeesKey, out Employees))
-            {
-                return await Task.FromResult(Employees);
-            }
-            else
-            {
-                Employees = _employeeService.GetEmployees().Result.Where(s => s.Salary > requestQuery.MinSal && s.Salary < requestQuery.MaxSal)
-                    .OrderBy(s => s.EmployeeID)                       
-                    .ToList();
+            //    //TakeWhile - will take till condition specifies
+            //    //SequenceEqual - Should match the sequence and location
+            //    var cacheOptions = new MemoryCacheEntryOptions()
+            //        .SetSlidingExpiration(TimeSpan.FromSeconds(30));
 
-                Employees = Employees.Skip(requestQuery.PageSize * (requestQuery.Page - 1))
-                            .Take(requestQuery.PageSize).ToList();
-
-
-                //TakeWhile - will take till condition specifies
-                //SequenceEqual - Should match the sequence and location
-                var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromSeconds(30));
-
-                //Set object in cache
-                _memCacheProvider.Set(CacheKeys.GetAllEmployeesKey, Employees, cacheOptions);
-                return await Task.FromResult(Employees);
-            }
+            //    //Set object in cache
+            //    _memCacheProvider.Set(CacheKeys.GetAllEmployeesKey, Employees, cacheOptions);
+            //    return await Task.FromResult(Employees);
+            //}
 
             //return Ok(Employees);
 
