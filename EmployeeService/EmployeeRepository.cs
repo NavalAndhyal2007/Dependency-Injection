@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace DIWebApiTutorial.EmployeeService
 {
+    //Added Solid Principles
     public class EmployeeRepository : IEmployeeService
     {
         public EmployeeContext _employeeDbContext;
