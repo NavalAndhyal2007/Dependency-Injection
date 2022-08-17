@@ -34,11 +34,13 @@ namespace DIWebApiTutorial.EmployeeService
         public async Task<Employee> UpdateEmployee(Employee employee)
         {
             //Employee updatedEmployee = null
+            Employee findEmp = await GetEmployee(employee.EmpID);
             int NoOfRecordsUpdated = 0;
             lock (employeeLock)
             {
-                if(GetEmployee(employee.EmpID).Result != null )
+                if(findEmp != null)
                 {
+                    employee.EmployeeID = findEmp.EmployeeID;
                     _employeeDbContext.EmployeeTbl.Update(employee);
                     NoOfRecordsUpdated = _employeeDbContext.SaveChangesAsync().Result;
                 }

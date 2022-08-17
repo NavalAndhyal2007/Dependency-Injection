@@ -61,12 +61,7 @@ namespace DIWebApiTutorial.CacheManager
 
         public static void DeleteFromCache(string cacheKey, IMemoryCache memoryCache)
         {
-            //var cacheOptions = new MemoryCacheEntryOptions()
-            //       .SetSlidingExpiration(TimeSpan.FromSeconds(120));
-
-            //memoryCache.Set(CacheKeys.GetAllEmployeesKey, value, cacheOptions);
             memoryCache.Remove(cacheKey);
-
         }
     }
 }

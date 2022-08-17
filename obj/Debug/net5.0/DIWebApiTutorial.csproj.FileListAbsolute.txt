@@ -55,3 +55,5 @@ C:\Users\Naval_Andhyal\source\repos\DotNet Training\MiddlewareSample\DIWebApiTut
 C:\Users\Naval_Andhyal\source\repos\DotNet Training\MiddlewareSample\DIWebApiTutorial\bin\Debug\net5.0\Newtonsoft.Json.Bson.dll
 C:\Users\Naval_Andhyal\source\repos\DotNet Training\MiddlewareSample\DIWebApiTutorial\bin\Debug\net5.0\Microsoft.AspNetCore.Mvc.Versioning.dll
 C:\Users\Naval_Andhyal\source\repos\DotNet Training\MiddlewareSample\DIWebApiTutorial\obj\Debug\net5.0\DIWebApiTutorial.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\Naval_Andhyal\source\repos\DotNet Training\MiddlewareSample\DIWebApiTutorial\bin\Debug\net5.0\Castle.Core.dll
+C:\Users\Naval_Andhyal\source\repos\DotNet Training\MiddlewareSample\DIWebApiTutorial\bin\Debug\net5.0\Moq.dll
