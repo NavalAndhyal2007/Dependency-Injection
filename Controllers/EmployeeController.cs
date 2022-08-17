@@ -36,35 +36,7 @@ namespace DIWebApiTutorial.Controllers
         //public IEnumerable<Employee> GetEmployees([FromQuery] RequestQuery requestQuery)
         public async Task<List<Employee>> GetEmployees([FromQuery] RequestQuery requestQuery)
         {
-            return await CacheManager.CacheManager.GetEmployees(requestQuery, _employeeService, _memCacheProvider);//CacheManager.GetEmployees(requestQuery,_employeeService,_memCacheProvider);
-            //return await CacheManager.GetEmployees(requestQuery, _employeeService, _memCacheProvider);//CacheManager.GetEmployees(requestQuery,_employeeService,_memCacheProvider);
-            //List<Employee> Employees = new List<Employee>();
-            //if (_memCacheProvider.TryGetValue(CacheKeys.GetAllEmployeesKey, out Employees))
-            //{
-            //    return await Task.FromResult(Employees);
-            //}
-            //else
-            //{
-            //    Employees = _employeeService.GetEmployees().Result.Where(s => s.Salary > requestQuery.MinSal && s.Salary < requestQuery.MaxSal)
-            //        .OrderBy(s => s.EmployeeID)                       
-            //        .ToList();
-
-            //    Employees = Employees.Skip(requestQuery.PageSize * (requestQuery.Page - 1))
-            //                .Take(requestQuery.PageSize).ToList();
-
-
-            //    //TakeWhile - will take till condition specifies
-            //    //SequenceEqual - Should match the sequence and location
-            //    var cacheOptions = new MemoryCacheEntryOptions()
-            //        .SetSlidingExpiration(TimeSpan.FromSeconds(30));
-
-            //    //Set object in cache
-            //    _memCacheProvider.Set(CacheKeys.GetAllEmployeesKey, Employees, cacheOptions);
-            //    return await Task.FromResult(Employees);
-            //}
-
-            //return Ok(Employees);
-
+            return await CacheManager.CacheManager.GetEmployees(requestQuery, _employeeService, _memCacheProvider);
         }
 
         [HttpPost("AddEmployee")]
@@ -82,8 +54,9 @@ namespace DIWebApiTutorial.Controllers
         //[Route("api/Employee/UpdateEmployee")]
         public async Task<IActionResult> UpdateEmployee(Employee employee)
         {
-            await _employeeService.UpdateEmployee(employee);
-            return Ok("Employee with ID : "+ employee.EmpID + "is Updated Successfully.");
+            return await _employeeService.UpdateEmployee(employee) != null
+                ? Ok("Employee with ID : "+ employee.EmpID + "is Updated Successfully.")
+                : NotFound($"Employee Not Found with ID : {employee.EmpID}");
         }
 
         [HttpDelete("DeleteEmployee")]
@@ -95,6 +68,7 @@ namespace DIWebApiTutorial.Controllers
             if (existingEmployee != null)
             {
                 await _employeeService.DeleteEmployee(existingEmployee.EmpID);
+                CacheManager.CacheManager.DeleteFromCache(CacheKeys.GetAllEmployeeKey + "_" + existingEmployee.EmpID,_memCacheProvider);
                 return Ok("Employee with ID : " + existingEmployee.EmpID + " is Deleted Successfully.");
             }
             return NotFound($"Employee Not Found with ID : {id}");
@@ -102,9 +76,18 @@ namespace DIWebApiTutorial.Controllers
 
         [HttpGet("GetEmployee")]
         [Route("[action]")]
-        public async Task<Employee> GetEmployee(int id)
+        public async Task<IActionResult> GetEmployee(int id)
         {
-            return await Task.FromResult(_employeeService.GetEmployee(id)).Result;
+            Employee employee = await CacheManager.CacheManager.GetEmployee(id, _employeeService, _memCacheProvider);
+            if(employee != null)
+            {
+                return Ok(employee);
+            }
+            else
+            {
+                return NotFound($"Employee Not Found with ID : {id}");
+            }
+           // return await Task.FromResult(_employeeService.GetEmployee(id)).Result;
         }
     }
 

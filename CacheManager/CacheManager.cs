@@ -40,19 +40,14 @@ namespace DIWebApiTutorial.CacheManager
         public static async Task<Employee> GetEmployee(int id,IEmployeeService _employeeService, IMemoryCache _memCacheProvider)
         {
             Employee employee = new Employee();
-            if (!_memCacheProvider.TryGetValue(CacheKeys.GetAllEmployeesKey, out employee))
+            if (!_memCacheProvider.TryGetValue(CacheKeys.GetAllEmployeeKey+"_"+id, out employee))
             {
                 employee = await _employeeService.GetEmployee(id);
-                InsertToCache(CacheKeys.GetAllEmployeeKey, employee, _memCacheProvider);
+                if(employee != null)
+                    InsertToCache(CacheKeys.GetAllEmployeeKey+"_"+employee.EmpID, employee, _memCacheProvider);
                 //return employee;
             }
             return employee;
-            //else
-            //{
-            //    employee = await _employeeService.GetEmployee(id);
-            //    InsertToCache(CacheKeys.GetAllEmployeeKey, employee, _memCacheProvider);
-            //    return employee;
-            //}
         }
 
         public static void InsertToCache(string cacheKey, object value,IMemoryCache memoryCache)
@@ -60,7 +55,17 @@ namespace DIWebApiTutorial.CacheManager
             var cacheOptions = new MemoryCacheEntryOptions()
                    .SetSlidingExpiration(TimeSpan.FromSeconds(120));
 
-            memoryCache.Set(CacheKeys.GetAllEmployeesKey, value, cacheOptions);
+            memoryCache.Set(cacheKey, value, cacheOptions);
+
+        }
+
+        public static void DeleteFromCache(string cacheKey, IMemoryCache memoryCache)
+        {
+            //var cacheOptions = new MemoryCacheEntryOptions()
+            //       .SetSlidingExpiration(TimeSpan.FromSeconds(120));
+
+            //memoryCache.Set(CacheKeys.GetAllEmployeesKey, value, cacheOptions);
+            memoryCache.Remove(cacheKey);
 
         }
     }

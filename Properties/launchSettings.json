@@ -6,7 +6,7 @@
     "iisExpress": {
       "applicationUrl": "http://localhost:56554",
       //"applicationUrl": "http://localhost:8082",
-      "sslPort": 0
+      "sslPort": 44377
     }
   },
   "profiles": {
