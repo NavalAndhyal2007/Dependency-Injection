@@ -55,7 +55,7 @@ namespace DIWebApiTutorial
             {
                 options.AddDefaultPolicy(builder =>
                 {
-                    builder.WithOrigins("https://localhost:44376")
+                    builder.WithOrigins("https://localhost:44376", "http://localhost:4200")
                     //builder.WithOrigins("https://localhost:44377/")
                     .AllowAnyHeader()
                     .AllowAnyMethod();

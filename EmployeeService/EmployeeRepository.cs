@@ -21,6 +21,10 @@ namespace DIWebApiTutorial.EmployeeService
         {
             lock (employeeLock)
             {
+                if(employee.EmpID == 0)
+                {
+                    employee.EmpID = GetMaxEmpID();
+                }
                 _employeeDbContext.EmployeeTbl.AddAsync(employee);
                 _employeeDbContext.SaveChangesAsync();                
             }
@@ -71,7 +75,12 @@ namespace DIWebApiTutorial.EmployeeService
 
         public async Task<Employee> GetEmployee(int Id)
         {
-            return await _employeeDbContext.EmployeeTbl.FirstOrDefaultAsync(x => x.EmpID == Id);
+            return await _employeeDbContext.EmployeeTbl.AsNoTracking().FirstOrDefaultAsync(x => x.EmpID == Id);
+        }
+
+        public int GetMaxEmpID()
+        {
+            return _employeeDbContext.EmployeeTbl.Max(u => u.EmpID);
         }
     }
 }
